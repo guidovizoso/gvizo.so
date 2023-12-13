@@ -1,0 +1,207 @@
+---
+    title: "Revamp Your Blog for the New Year: Open Source Edition"
+    summary: "Kick off the new year by giving your blog a fresh, open-source makeover. Dive into my journey of reimagining my blog with cutting-edge tech and get inspired to do the same!"
+    publishedAt: 2023-12-13
+---
+
+As we welcome the new year, it's the perfect time to refresh our digital spaces. My journey into redoing my website began with an encounter with a tweet from Lee Robinson, sparking inspiration for a complete overhaul. Here, I share the steps, tools, and decisions that shaped my revamped blog – now open for you to explore, fork, and enjoy.
+
+<Tweet id="1727345985314283637" />
+
+## The Inspiration Behind the Change
+Inspired by Lee's minimalist approach, I embarked on a journey to declutter my `package.json`. I evaluated my existing tools, keeping some, discarding others, and embracing new ones. Here's a glimpse of the decisions I made:
+
+
+<Text variant="lead">If you want to jump directly to the finished code, [check here](#this-is-entirely-open-source)</Text>
+
+I started from scratch with simplicity in mind. Let's go through the decision making process:
+
+- **From Next pages router to App router**: Futureproofing and keeping up to date with Next >13.
+- **Replacing CollectedNotes and MDXBundler with next-mdx-remote**: Simplifying content management.
+- **Switching from HeadlessUI to shadcn/ui**: Opting for a more customizable, accessible, and lightweight UI toolkit.
+- **Introducing a View Counter using Redis (Upstash)**: A fun, non-intrusive way to keep track of engagement.
+
+## App router
+Wit the paradigm shift of the Next.Js team to the app router it was a no-brainer. I have to be honest here: At [Antartida](https://antartida.io) we were early adopters of the app router and we had to deal with some performance and compatibility issues at first. I'm glad the Next.Js team has focused so much in fixing those issues in following releases and now it's the way to go.
+
+The Next team's shift towards the app router was a big paradigm shift. At [Antartida](https://antartida.io), we were early adopters, initially facing some performance and compatibility challenges. However, the Next team's dedication to improvement made it an essential part of our toolkit.
+
+## Simplifying with next-mdx-remote
+Aiming for simplicity, I decided to eliminate third-party services. This also allows me to include more dynamic content in the future.
+
+Here's my `mdx.ts` file in my `lib` folder:
+
+```ts
+import path from "path";
+import fs from "fs";
+import { compileMDX } from "next-mdx-remote/rsc";
+import { config } from "@/config";
+
+function getMDXFiles(dir: string) {
+  return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
+}
+
+async function readMDXFile(filePath: string) {
+  let rawContent = fs.readFileSync(filePath, "utf-8");
+  const mdx = await compileMDX({
+    source: rawContent,
+    options: { parseFrontmatter: true },
+  });
+  return { ...mdx, rawContent };
+}
+
+async function getMDXData(dir: string) {
+  const files = getMDXFiles(dir);
+  const promises = files.map(async (file) => {
+    const filePath = path.join(dir, file);
+    const { frontmatter, rawContent } = await readMDXFile(filePath);
+    return {
+      slug: file.replace(".mdx", ""),
+      frontmatter,
+      rawContent,
+    };
+  });
+
+  const data = await Promise.all(promises);
+  return data;
+}
+
+export async function getBlogPosts() {
+  return await getMDXData(path.join(process.cwd(), "content"));
+}
+
+export function getURLForMetadata() {
+  if (process.env.NODE_ENV === "production") {
+    return config.domain;
+  } else {
+    return "http://localhost:4500";
+  }
+}
+```
+
+And it's being used like this:
+
+```ts
+import { notFound } from "next/navigation";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { getBlogPosts, getURLForMetadata } from "@/lib/mdx";
+
+export default async function Post({ params }: { params: PageParams }) {
+  const post = (await (
+    await getBlogPosts()
+  ).find((post) => post.slug === params.slug)) as {
+    slug: string;
+    frontmatter: FrontMatter;
+    rawContent: string;
+  };
+
+  if (!post) {
+    return notFound();
+  }
+
+  return (
+    <main className="mx-auto max-w-screen-md w-full px-4 md:px-0">
+      <div className="mt-16">
+        <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl">
+          {post.frontmatter.title}
+        </h1>
+      </div>
+      <div className="mt-12">
+        <MDXRemote
+          source={post.rawContent}
+          components={{ ...components }}
+          options={{
+            parseFrontmatter: true,
+          }}
+        />
+      </div>
+    </main>
+  );
+}
+```
+
+<Callout emoji="⚠️" type="warning" title="Caveat">
+    This approach will compile the MDX files twice, once to get frontmatter data and another one to get the actual content. It's not that big of a deal for a simple personal blog, but take it into account if you have thousands of files.
+</Callout>
+
+
+## shadcn/ui for UI Components
+Replacing HeadlessUI with [shadcn/ui](https://ui.shadcn.com) was another strategic move. shadcn/ui is known for being customizable, accessible and lightweight. You get the entire file leveraging Tailwind and Radix so there's no need to start from scratch.
+
+## An Unobtrusive View Counter
+For the view counter, my goal was efficiency without intrusion. It's a fun, light-hearted metric, not meant for tracking or boasting. Here's how I integrated it into the project:
+
+I started by adding `@upstash/redis`. Upstash has a free tier that's more than enough for this use case. I added a `redis.ts` file to my `lib` folder:
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const formatter = Intl.NumberFormat("en", { notation: "compact" });
+
+const formatStats = (stats: Record<string, unknown> | null) => {
+  const numStats = {
+    views: stats?.views ? Number(stats.views) : 0,
+  };
+
+  return {
+    views:
+      formatter.format(numStats.views) +
+      (numStats.views === 1 ? " view" : " views"),
+  };
+};
+
+const redis = Redis.fromEnv();
+
+export enum PostStat {
+  Views = "views",
+  Likes = "likes",
+  Claps = "claps",
+}
+
+export async function incrementPostStat(slug: string, stat: PostStat) {
+  return await redis.hincrby(`post:${slug}`, stat, 72);
+}
+
+export async function getPostStats(slug: string) {
+  const stats = await redis.hgetall(`post:${slug}`);
+
+  return formatStats(stats);
+}
+```
+
+As you can see there's some space to add _"likes"_ and _"claps"_ in the future.
+
+## Open Sourcing The Journey
+For the first time I'm open sourcing my personal website. It feels right. I've gathered a lot of inspiration from Lee's blog, the tech stack is also built and mantained by open source communities. So I hope this article helps you in some way or another.
+
+<GithubRepo owner="guidovizoso" name="gvizo.so" />
+
+### Setting Up Your Version
+Ready to build your own version? Here's how you can get started:
+
+1. **Environment Setup**: Visit [Upstash](https://upstash.com) to set up a free account. Create a Redis database and note the connection URL and token. Add these to a `.env` file in your project's root.
+
+2. **Configuring `config.ts`**: Tailor the `config.ts` file to reflect your personal or brand identity. Here's an example:
+
+3. **Organizing Content**: Store your blog posts in the `content` folder, using the file name as the post slug. This setup supports frontmatter and allows for extensive customization.
+
+```
+UPSTASH_REDIS_REST_URL="YOUR_URL"
+UPSTASH_REDIS_REST_TOKEN="YOUR_TOKEN"
+```
+
+```ts
+export const config = {
+  domain: "https://gvizo.so",
+  name: "Guido Vizoso",
+  description: "Product Engineer & Frontend Team Lead",
+  faviconEmoji: "🔷",
+};
+```
+
+## Future Enhancements
+The journey doesn't end here. I plan to refine components like Tweet and GithubRepo for better error handling and explore other areas for improvement.
+
+Feedback and contributions are always welcome. Let's make this a collaborative effort to push the boundaries of what our personal websites can be!
+
+Remember, this is more than just a blog update; it's an invitation to explore, learn, and create. Happy coding!
