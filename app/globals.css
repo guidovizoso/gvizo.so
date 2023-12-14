@@ -73,6 +73,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  ul {
+    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+  }
   :not(pre) > code {
     @apply bg-card border border-border text-card-foreground rounded-sm px-1.5 py-0.5;
   }

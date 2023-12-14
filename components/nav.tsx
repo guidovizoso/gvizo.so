@@ -48,7 +48,7 @@ export function Nav() {
         </nav>
         <div className="flex flex-row gap-2 items-center">
           <Link
-            href="https://twitter.com/guido_vizoso"
+            href={config.twitterUrl}
             target="_blank"
             className="h-8 px-2 flex items-center justify-center"
           >
@@ -59,7 +59,7 @@ export function Nav() {
             </svg>
           </Link>
           <Link
-            href="https://twitter.com/guido_vizoso"
+            href={config.githubUrl}
             target="_blank"
             className="h-8 px-2 flex items-center justify-center"
           >

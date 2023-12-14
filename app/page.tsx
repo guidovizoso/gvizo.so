@@ -37,7 +37,7 @@ export default async function Home() {
         </Button>
         .
       </p>
-      <p>I specialize in Typescript, React and Next.Js.</p>
+      <p>I specialize in Typescript, React and Next.</p>
       <div className="mt-12">
         {posts.map((post) => {
           const publishedAtDate = new Date(
