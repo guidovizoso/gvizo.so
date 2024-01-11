@@ -23,7 +23,7 @@ export enum PostStat {
 }
 
 export async function incrementPostStat(slug: string, stat: PostStat) {
-  return await redis.hincrby(`post:${slug}`, stat, 72);
+  return await redis.hincrby(`post:${slug}`, stat, 1);
 }
 
 export async function getPostStats(slug: string) {

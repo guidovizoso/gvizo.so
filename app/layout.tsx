@@ -12,6 +12,7 @@ const inconsolata = Inconsolata({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(config.domain),
   title: {
     default: config.name,
     template: `%s — ${config.name}`,

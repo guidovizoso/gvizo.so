@@ -3,6 +3,41 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { getBlogPosts } from "@/lib/mdx";
+import {
+  BookText,
+  Github,
+  Link as LinkIcon,
+  Sparkles,
+  Twitter,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import profilePicture from "./profile-picture.png";
+
+const BADGES = [
+  {
+    name: "Working at Antartida",
+    url: "https://antartida.io",
+    icon: LinkIcon,
+  },
+  {
+    name: "Twitter (X)",
+    url: "https://twitter.com/guido_vizoso",
+    icon: Twitter,
+  },
+  {
+    name: "Github",
+    url: "https://github.com/guidovizoso",
+    icon: Github,
+  },
+  {
+    name: "Learning ML/AI",
+    icon: Sparkles,
+  },
+  {
+    name: "Focusing on blogging",
+    icon: BookText,
+  },
+];
 
 export const metadata = {
   title: "Guido Vizoso",
@@ -10,35 +45,66 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const posts = await getBlogPosts();
+  // get posts sorted by publishedAt date
+  const posts = await getBlogPosts().then((posts) =>
+    posts.sort(
+      (a, b) =>
+        new Date(b.frontmatter.publishedAt as string).getTime() -
+        new Date(a.frontmatter.publishedAt as string).getTime()
+    )
+  );
 
   return (
-    <main className="mx-auto max-w-screen-md w-full px-4 md:px-0">
-      <h1 className="scroll-m-20 text-3xl font-bold tracking-tight mt-16">
-        Hello there, I&apos;m <span>Guido</span>
+    <main className="mx-auto max-w-screen-md w-full px-4 md:px-0 pb-12 md:p-0">
+      <Image
+        className="mx-auto w-24 h-24 rounded-full mt-20"
+        src={profilePicture}
+        alt="Profile picture"
+      />
+      <h1 className="scroll-m-20 text-3xl font-bold tracking-tight mt-6 text-center">
+        Guido Vizoso
       </h1>
-      <p>
-        I&apos;m a Product Engineer and Frontend Team Lead currently working at{" "}
-        <Button
-          asChild
-          variant="secondary"
-          className="px-1.5 py-0.5 h-auto border border-border w-fit inline-flex flex-row items-center gap-1"
-        >
-          <Link href="https://antartida.io" target="_blank">
-            <Image
-              src="antartida.svg"
-              alt="Antartida logo"
-              width={14}
-              height={14}
-              className="inline-block"
-            />
-            Antartida
-          </Link>
-        </Button>
-        .
+      <p className="text-center mt-2 text-foreground/70">
+        Product Engineer and Frontend Team Lead at{" "}
+        <Link href="https://antartida.io" target="_blank">
+          Antartida
+        </Link>
       </p>
-      <p>I specialize in Typescript, React and Next.</p>
-      <div className="mt-12">
+      <div className="flex mx-auto flex-row flex-wrap gap-2 items-center justify-center max-w-md mt-6">
+        {BADGES.map((badge) => {
+          const Icon = badge.icon;
+
+          const containerClassNames = cn(
+            "bg-foreground/5 px-2 py-0.5 text-sm border border-border rounded-xl flex flex-row gap-1.5 items-center",
+            {
+              "hover:bg-foreground/10 transition-all": !!badge.url,
+              "cursor-default": !badge.url,
+            }
+          );
+
+          if (!badge.url)
+            return (
+              <div key={badge.name} className={containerClassNames}>
+                <Icon size={14} />
+                {badge.name}
+              </div>
+            );
+
+          return (
+            <Link
+              key={badge.name}
+              href={badge.url}
+              target="_blank"
+              className={containerClassNames}
+            >
+              <Icon size={14} />
+              {badge.name}
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="mt-20">
         {posts.map((post) => {
           const publishedAtDate = new Date(
             post.frontmatter.publishedAt as string
@@ -50,7 +116,7 @@ export default async function Home() {
           return (
             <article
               key={post.slug}
-              className="flex max-w-xl flex-col items-start justify-between"
+              className="flex flex-col items-start justify-between first:mt-0 mt-8 max-w-xl mx-auto"
             >
               <div className="flex items-center gap-x-4 text-xs">
                 <p className="text-foreground/70">{timeAgo}</p>

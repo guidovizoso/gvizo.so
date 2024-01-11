@@ -20,10 +20,10 @@ const NavLink = ({
     <Link
       href={href}
       className={cn(
-        "w-[8ch] h-8 flex items-center justify-center font-medium text-sm transition-all rounded-lg border",
+        "flex items-center justify-center font-medium text-sm transition-all rounded-lg",
         {
-          "border-border": isActive,
-          "border-transparent hover:border-border": !isActive,
+          "text-foreground": isActive,
+          "text-foreground/60 hover:text-foreground": !isActive,
         }
       )}
     >
@@ -34,15 +34,15 @@ const NavLink = ({
 
 export function Nav() {
   return (
-    <div className="mx-auto max-w-screen-md w-full px-4 md:px-0 mt-4 flex flex-row gap-4 items-center justify-between">
+    <div className="mx-auto max-w-screen-md w-full px-4 md:px-0 pt-3 flex flex-row gap-4 items-center justify-between">
       <div>
         <h2 className="font-medium flex items-center gap-2">
           <span className="text-lg">{config.faviconEmoji}</span>{" "}
-          <span className="hidden md:inline">Guido Vizoso</span>
+          <span className="hidden md:inline">{config.name}</span>
         </h2>
       </div>
-      <div className="flex flex-row gap-4">
-        <nav className="w-fit flex flex-row gap-2">
+      <div className="flex flex-row gap-6">
+        <nav className="w-fit flex flex-row gap-6">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/about">About</NavLink>
         </nav>
