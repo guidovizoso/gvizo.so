@@ -60,6 +60,7 @@ export default async function Home() {
         className="mx-auto w-24 h-24 rounded-full mt-20"
         src={profilePicture}
         alt="Profile picture"
+        priority
       />
       <h1 className="scroll-m-20 text-3xl font-bold tracking-tight mt-6 text-center">
         Guido Vizoso
