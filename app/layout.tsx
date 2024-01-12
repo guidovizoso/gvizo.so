@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     siteName: config.name,
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: `${config.domain}/og`,
+      },
+    ],
   },
   robots: {
     index: true,
@@ -40,6 +45,11 @@ export const metadata: Metadata = {
   twitter: {
     title: config.name,
     card: "summary_large_image",
+    images: [
+      {
+        url: `${config.domain}/og`,
+      },
+    ],
   },
 };
 

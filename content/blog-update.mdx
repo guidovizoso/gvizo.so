@@ -69,14 +69,6 @@ async function getMDXData(dir: string) {
 export async function getBlogPosts() {
   return await getMDXData(path.join(process.cwd(), "content"));
 }
-
-export function getURLForMetadata() {
-  if (process.env.NODE_ENV === "production") {
-    return config.domain;
-  } else {
-    return "http://localhost:4500";
-  }
-}
 ```
 
 And it's being used like this:
@@ -84,7 +76,7 @@ And it's being used like this:
 ```ts
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getBlogPosts, getURLForMetadata } from "@/lib/mdx";
+import { getBlogPosts } from "@/lib/mdx";
 
 export default async function Post({ params }: { params: PageParams }) {
   const post = (await (

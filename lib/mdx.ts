@@ -35,11 +35,3 @@ async function getMDXData(dir: string) {
 export async function getBlogPosts() {
   return await getMDXData(path.join(process.cwd(), "content"));
 }
-
-export function getURLForMetadata() {
-  if (process.env.NODE_ENV === "production") {
-    return config.domain;
-  } else {
-    return "http://localhost:4500";
-  }
-}

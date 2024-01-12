@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { format, formatDistanceToNow } from "date-fns";
-import { getBlogPosts, getURLForMetadata } from "@/lib/mdx";
+import { getBlogPosts } from "@/lib/mdx";
 import { components } from "./components";
 import { config } from "@/config";
 import { Stats } from "./stats";
@@ -34,8 +34,8 @@ export async function generateMetadata({
   let { title, publishedAt, summary, image } = post.frontmatter as FrontMatter;
 
   let ogImage = image
-    ? `${getURLForMetadata()}${image}`
-    : `${getURLForMetadata}/og?title=${title}`;
+    ? `${config.domain}${image}`
+    : `${config.domain}/og?title=${title}`;
 
   return {
     title,
