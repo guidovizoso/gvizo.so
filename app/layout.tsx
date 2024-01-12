@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { config } from "@/config";
 import { Nav } from "@/components/nav";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const inconsolata = Inconsolata({
@@ -74,6 +75,7 @@ export default function RootLayout({
       >
         <Nav />
         {children}
+        <Analytics />
       </body>
     </html>
   );

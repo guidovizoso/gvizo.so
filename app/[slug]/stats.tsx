@@ -11,7 +11,7 @@ export async function Stats({ slug }: { slug: string }) {
 
   return (
     <div className="flex flex-row gap-2 text-sm">
-      <span className="text-foreground/70">{stats.views}</span> stat
+      <span className="text-foreground/70">{stats.views}</span>
     </div>
   );
 }

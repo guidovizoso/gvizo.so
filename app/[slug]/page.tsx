@@ -56,7 +56,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description: summary,
-      images: [ogImage],
+      images: [{ url: ogImage }],
     },
   };
 }
