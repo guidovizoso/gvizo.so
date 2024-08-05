@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -12,11 +11,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import profilePicture from "./profile-picture.png";
+import { PostItem } from "@/app/post-item";
 
 const BADGES = [
   {
     name: "Working at Antartida",
-    url: "https://antartida.io",
+    url: "https://antartida.ai",
     icon: LinkIcon,
   },
   {
@@ -55,7 +55,7 @@ export default async function Home() {
   );
 
   return (
-    <main className="mx-auto max-w-screen-md w-full px-4 md:px-0 pb-12 md:p-0">
+    <main className="mx-auto max-w-screen-md w-full px-4 md:px-0 pb-12 md:pb-20">
       <Image
         className="mx-auto w-24 h-24 rounded-full mt-20"
         src={profilePicture}
@@ -67,7 +67,7 @@ export default async function Home() {
       </h1>
       <p className="text-center mt-2 text-foreground/70">
         Product Engineer and Frontend Team Lead at{" "}
-        <Link href="https://antartida.io" target="_blank">
+        <Link href="https://antartida.ai" target="_blank">
           Antartida
         </Link>
       </p>
@@ -106,36 +106,9 @@ export default async function Home() {
       </div>
 
       <div className="mt-20">
-        {posts.map((post) => {
-          const publishedAtDate = new Date(
-            post.frontmatter.publishedAt as string
-          );
-          const timeAgo = formatDistanceToNow(publishedAtDate, {
-            addSuffix: true,
-          });
-
-          return (
-            <article
-              key={post.slug}
-              className="flex flex-col items-start justify-between first:mt-0 mt-8 max-w-xl mx-auto"
-            >
-              <div className="flex items-center gap-x-4 text-xs">
-                <p className="text-foreground/70">{timeAgo}</p>
-              </div>
-              <div className="group relative">
-                <h3 className="mt-1 scroll-m-20 text-xl font-semibold tracking-tight">
-                  <Link href={post.slug}>
-                    <span className="absolute inset-0" />
-                    {post.frontmatter.title as string}
-                  </Link>
-                </h3>
-                <p className="mt-1 line-clamp-3 text-sm leading-6 text-foreground/70">
-                  {post.frontmatter.summary as string}
-                </p>
-              </div>
-            </article>
-          );
-        })}
+        {posts.map((post) => (
+          <PostItem key={post.slug} post={post} />
+        ))}
       </div>
     </main>
   );

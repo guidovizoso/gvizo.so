@@ -31,9 +31,10 @@ export async function generateMetadata({
     return;
   }
 
-  let { title, publishedAt, summary, image } = post.frontmatter as FrontMatter;
+  const { title, publishedAt, summary, image } =
+    post.frontmatter as FrontMatter;
 
-  let ogImage = image
+  const ogImage = image
     ? `${config.domain}${image}`
     : `${config.domain}/og?title=${title}`;
 

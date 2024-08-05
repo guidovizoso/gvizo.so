@@ -3,7 +3,7 @@ export const EXPERIENCE = [
     date: "2022 — Present",
     title: "Product Engineer & Frontend Team Lead",
     at: "Antartida",
-    atUrl: "https://antartida.io",
+    atUrl: "https://antartida.ai",
     desc: `
     Leading multiple frontend teams with my main focus building a factoring platform product. The stack is Typescript, NextJs, React, react-query, TailwindCSS and shadcn/ui. In this role I have to evaluate code reviews, mentor fellow developers and define the best practices and standards for the projects. I'm also contributing to the roadmap of the products by asessing new features, talking to product team and stakeholders and providing feedback and suggestions on how to improve the user experience.
     `,

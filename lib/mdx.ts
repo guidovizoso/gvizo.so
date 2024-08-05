@@ -1,14 +1,13 @@
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
 import { compileMDX } from "next-mdx-remote/rsc";
-import { config } from "@/config";
 
 function getMDXFiles(dir: string) {
   return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
 }
 
 async function readMDXFile(filePath: string) {
-  let rawContent = fs.readFileSync(filePath, "utf-8");
+  const rawContent = fs.readFileSync(filePath, "utf-8");
   const mdx = await compileMDX({
     source: rawContent,
     options: { parseFrontmatter: true },
