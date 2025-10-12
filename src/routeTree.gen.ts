@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OgRouteImport } from './routes/og'
 import { Route as PostsRouteImport } from './routes/_posts'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as PostsPostsIndexRouteImport } from './routes/_posts/posts/index'
 import { Route as PostsPostsSlugRouteImport } from './routes/_posts/posts/$slug'
 
+const OgRoute = OgRouteImport.update({
+  id: '/og',
+  path: '/og',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostsRoute = PostsRouteImport.update({
   id: '/_posts',
   getParentRoute: () => rootRouteImport,
@@ -40,11 +46,13 @@ const PostsPostsSlugRoute = PostsPostsSlugRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/og': typeof OgRoute
   '/': typeof AppIndexRoute
   '/posts/$slug': typeof PostsPostsSlugRoute
   '/posts': typeof PostsPostsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/og': typeof OgRoute
   '/': typeof AppIndexRoute
   '/posts/$slug': typeof PostsPostsSlugRoute
   '/posts': typeof PostsPostsIndexRoute
@@ -53,19 +61,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_posts': typeof PostsRouteWithChildren
+  '/og': typeof OgRoute
   '/_app/': typeof AppIndexRoute
   '/_posts/posts/$slug': typeof PostsPostsSlugRoute
   '/_posts/posts/': typeof PostsPostsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/posts/$slug' | '/posts'
+  fullPaths: '/og' | '/' | '/posts/$slug' | '/posts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/posts/$slug' | '/posts'
+  to: '/og' | '/' | '/posts/$slug' | '/posts'
   id:
     | '__root__'
     | '/_app'
     | '/_posts'
+    | '/og'
     | '/_app/'
     | '/_posts/posts/$slug'
     | '/_posts/posts/'
@@ -74,10 +84,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   PostsRoute: typeof PostsRouteWithChildren
+  OgRoute: typeof OgRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/og': {
+      id: '/og'
+      path: '/og'
+      fullPath: '/og'
+      preLoaderRoute: typeof OgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_posts': {
       id: '/_posts'
       path: ''
@@ -141,6 +159,7 @@ const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   PostsRoute: PostsRouteWithChildren,
+  OgRoute: OgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

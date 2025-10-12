@@ -23,7 +23,32 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Guido",
+        title: "Guido Vizoso",
+      },
+      {
+        name: "description",
+        content: "Building systems that make products shine.",
+      },
+      {
+        name: "og:title",
+        content: "Guido Vizoso",
+      },
+      {
+        name: "og:description",
+        content: "Building systems that make products shine.",
+      },
+      {
+        name: "og:image",
+        content: "https://www.guidovizoso.com/og",
+      },
+
+      {
+        name: "og:url",
+        content: "https://www.gvizo.so",
+      },
+      {
+        name: "og:type",
+        content: "website",
       },
     ],
     links: [
