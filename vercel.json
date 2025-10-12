@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "og": {
-      "runtime": "nodejs20.x",
-      "includeFiles": "node_modules/@takumi-rs/core-*/**"
-    }
-  }
-}
