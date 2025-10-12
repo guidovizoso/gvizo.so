@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MenuIcon } from "lucide-react";
+import { ArrowUpRight, MenuIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -63,14 +63,22 @@ export function Header() {
             <MenuIcon />
           </SheetTrigger>
           <SheetContent>
-            <ul className="mt-24 flex flex-col gap-3 p-4">
+            <ul className="mt-40 flex flex-col gap-6 p-4">
               <li>
-                <Link className="w-full" to="/">
+                <Link
+                  activeProps={{ className: "font-semibold" }}
+                  className="w-full"
+                  to="/"
+                >
                   About
                 </Link>
               </li>
               <li>
-                <Link className="w-full" to="/posts">
+                <Link
+                  activeProps={{ className: "!text-foreground font-semibold" }}
+                  className="w-full"
+                  to="/posts"
+                >
                   Articles
                 </Link>
               </li>
@@ -81,7 +89,7 @@ export function Header() {
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  LinkedIn
+                  LinkedIn <ArrowUpRight className="inline-block size-4" />
                 </a>
               </li>
               <li>
@@ -91,7 +99,7 @@ export function Header() {
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  Github
+                  Github <ArrowUpRight className="inline-block size-4" />
                 </a>
               </li>
             </ul>

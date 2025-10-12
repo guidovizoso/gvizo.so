@@ -16,7 +16,7 @@ export default defineConfig({
         enabled: true,
         crawlLinks: true,
         filter: ({ path }) => {
-          console.log(path);
+          // console.log(path);
           // return path.includes("/posts");
           return true;
         },

@@ -59,7 +59,7 @@ export function Timeline() {
           <div className="flex items-start">
             <div className="relative space-y-2 border-l-2 pb-10 pl-4 group-last:pb-4 sm:pl-8">
               {/* Timeline Dot */}
-              <div className="-translate-x-1/2 -left-px absolute top-2 h-3 w-3 rounded-full border-2 border-primary bg-background" />
+              <div className="-translate-x-1/2 -left-px absolute top-1.5 h-3 w-3 rounded-full border-2 border-background bg-border" />
               <time className="mt-2 text-muted-foreground text-sm">{date}</time>
               <h3 className="">
                 {title} at{" "}

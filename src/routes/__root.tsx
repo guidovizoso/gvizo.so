@@ -3,10 +3,8 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../index.css?url";
 import "@fontsource-variable/inter";
@@ -45,7 +43,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
-  const isFetching = useRouterState({ select: (s) => s.isLoading });
+  // const isFetching = useRouterState({ select: (s) => s.isLoading });
   return (
     <html lang="en">
       {/** biome-ignore lint/style/noHeadElement: Required by TanStack Router */}
@@ -55,7 +53,8 @@ function RootDocument() {
       <body>
         <div className="grid h-svh grid-rows-[auto_1fr]">
           {/* <Header /> */}
-          {isFetching ? <Loader /> : <Outlet />}
+          {/* {isFetching ? <Loader /> : <Outlet />} */}
+          <Outlet />
         </div>
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />
