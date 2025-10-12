@@ -1,9 +1,26 @@
+import contentCollections from "@content-collections/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import tailwindcss from "@tailwindcss/vite";
-import viteReact from "@vitejs/plugin-react";
 
 export default defineConfig({
-	plugins: [tsconfigPaths(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    contentCollections(),
+    tsconfigPaths(),
+    tailwindcss(),
+    tanstackStart({
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+        filter: ({ path }) => path.startsWith("/posts"),
+        onSuccess: ({ page }) => {
+          // biome-ignore lint/suspicious/noConsole: Safety check
+          console.log(`Rendered ${page.path}!`);
+        },
+      },
+    }),
+    viteReact(),
+  ],
 });

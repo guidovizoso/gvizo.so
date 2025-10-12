@@ -33,6 +33,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "favicon",
+        href: "/favicon.svg",
+        type: "image/svg+xml",
+      },
     ],
   }),
 
@@ -43,6 +48,7 @@ function RootDocument() {
   const isFetching = useRouterState({ select: (s) => s.isLoading });
   return (
     <html lang="en">
+      {/** biome-ignore lint/style/noHeadElement: Required by TanStack Router */}
       <head>
         <HeadContent />
       </head>

@@ -1,0 +1,41 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { allPosts } from "content-collections";
+import { Separator } from "@/components/ui/separator";
+
+export const Route = createFileRoute("/_posts/posts/")({
+  head: () => ({
+    meta: [
+      { title: "Articles | G" },
+      { description: "Articles by Guido Vizoso" },
+    ],
+  }),
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  return (
+    <div>
+      <h1 className="font-serif text-3xl">Articles</h1>
+      <div className="mt-16">
+        {allPosts.map((post, index) => (
+          <>
+            <Link
+              key={post._meta.path}
+              params={{ slug: post._meta.path }}
+              to={"/posts/$slug"}
+            >
+              <div className="flex flex-col-reverse justify-between md:flex-row md:items-center">
+                <h2 className="">{post.title}</h2>
+                <span className="flex-shrink-0 text-muted-foreground text-sm">
+                  {post.publishedAt}
+                </span>
+              </div>
+              <p className="text-muted-foreground text-sm">{post.summary}</p>
+            </Link>
+            {index !== allPosts.length - 1 && <Separator className="my-4" />}
+          </>
+        ))}
+      </div>
+    </div>
+  );
+}

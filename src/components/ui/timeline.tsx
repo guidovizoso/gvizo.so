@@ -11,7 +11,7 @@ const experience = [
     title: "Lead Frontend Engineer",
     at: "Antartida",
     atUrl: "https://antartida.ai",
-    desc: "Lead the frontend team for a factoring platform (confidential). Stack: TypeScript, React, react-query, Tailwind. Responsible for code reviews, mentoring, defining standards, and contributing to the product roadmap alongside product and design teams.",
+    desc: "Lead the software factory's frontend team. Stack: TypeScript, React, react-query, Tailwind. Responsible for code reviews, mentoring, defining standards, and contributing to the product roadmap alongside product and design teams.",
   },
   {
     date: "2021 — 2022",
@@ -60,7 +60,7 @@ export function Timeline() {
             <div className="relative space-y-2 border-l-2 pb-10 pl-4 group-last:pb-4 sm:pl-8">
               {/* Timeline Dot */}
               <div className="-translate-x-1/2 -left-px absolute top-2 h-3 w-3 rounded-full border-2 border-primary bg-background" />
-              <time className="mt-2 text-sm">{date}</time>
+              <time className="mt-2 text-muted-foreground text-sm">{date}</time>
               <h3 className="">
                 {title} at{" "}
                 <a

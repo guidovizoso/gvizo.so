@@ -9,9 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PostsRouteImport } from './routes/_posts'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as PostsPostsIndexRouteImport } from './routes/_posts/posts/index'
+import { Route as PostsPostsSlugRouteImport } from './routes/_posts/posts/$slug'
 
+const PostsRoute = PostsRouteImport.update({
+  id: '/_posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -21,32 +28,63 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const PostsPostsIndexRoute = PostsPostsIndexRouteImport.update({
+  id: '/posts/',
+  path: '/posts/',
+  getParentRoute: () => PostsRoute,
+} as any)
+const PostsPostsSlugRoute = PostsPostsSlugRouteImport.update({
+  id: '/posts/$slug',
+  path: '/posts/$slug',
+  getParentRoute: () => PostsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/posts/$slug': typeof PostsPostsSlugRoute
+  '/posts': typeof PostsPostsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/posts/$slug': typeof PostsPostsSlugRoute
+  '/posts': typeof PostsPostsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/_posts': typeof PostsRouteWithChildren
   '/_app/': typeof AppIndexRoute
+  '/_posts/posts/$slug': typeof PostsPostsSlugRoute
+  '/_posts/posts/': typeof PostsPostsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/posts/$slug' | '/posts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/_app' | '/_app/'
+  to: '/' | '/posts/$slug' | '/posts'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_posts'
+    | '/_app/'
+    | '/_posts/posts/$slug'
+    | '/_posts/posts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  PostsRoute: typeof PostsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_posts': {
+      id: '/_posts'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -61,6 +99,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_posts/posts/': {
+      id: '/_posts/posts/'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof PostsPostsIndexRouteImport
+      parentRoute: typeof PostsRoute
+    }
+    '/_posts/posts/$slug': {
+      id: '/_posts/posts/$slug'
+      path: '/posts/$slug'
+      fullPath: '/posts/$slug'
+      preLoaderRoute: typeof PostsPostsSlugRouteImport
+      parentRoute: typeof PostsRoute
+    }
   }
 }
 
@@ -74,8 +126,21 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PostsRouteChildren {
+  PostsPostsSlugRoute: typeof PostsPostsSlugRoute
+  PostsPostsIndexRoute: typeof PostsPostsIndexRoute
+}
+
+const PostsRouteChildren: PostsRouteChildren = {
+  PostsPostsSlugRoute: PostsPostsSlugRoute,
+  PostsPostsIndexRoute: PostsPostsIndexRoute,
+}
+
+const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  PostsRoute: PostsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
