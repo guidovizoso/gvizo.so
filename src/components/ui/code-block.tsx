@@ -74,7 +74,6 @@ export function CodeBlockCode({
   const metastring = (props as any)?.["data-meta"] || "";
   const meta = parseMeta(metastring);
   const title = meta.title || meta.filename;
-  console.log({ props });
 
   const [html, setHtml] = React.useState<string>("");
 
