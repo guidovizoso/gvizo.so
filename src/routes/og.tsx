@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { createFileRoute } from "@tanstack/react-router";
 
 // import ImageResponse from "@/lib/image-response";
