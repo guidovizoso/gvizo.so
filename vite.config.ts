@@ -32,4 +32,7 @@ export default defineConfig({
   nitro: {
     preset: "vercel",
   },
+  ssr: {
+    external: ["@takumi-rs/core"],
+  },
 });
