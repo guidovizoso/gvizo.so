@@ -32,7 +32,7 @@ export default defineConfig({
   nitro: {
     preset: "vercel",
   },
-  ssr: {
-    noExternal: ["@takumi-rs/core"],
+  optimizeDeps: {
+    exclude: ["@takumi-rs/core"],
   },
 });

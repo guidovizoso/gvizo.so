@@ -1,5 +1,3 @@
-export const runtime = "nodejs";
-
 import { createFileRoute } from "@tanstack/react-router";
 
 // import ImageResponse from "@/lib/image-response";
@@ -115,6 +113,7 @@ export const Route = createFileRoute("/og")({
     handlers: {
       GET: async ({ request }) => {
         const { ImageResponse } = await import("@takumi-rs/image-response");
+
         // Query params
         const url = new URL(request.url);
         const title = url.searchParams.get("title");

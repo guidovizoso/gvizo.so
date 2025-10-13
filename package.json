@@ -20,6 +20,7 @@
     "@takumi-rs/core-linux-x64-gnu": "^0.36.1",
     "@takumi-rs/helpers": "^0.36.1",
     "@takumi-rs/image-response": "^0.36.1",
+    "@takumi-rs/wasm": "^0.36.1",
     "@tanstack/react-form": "^1.23.5",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-router": "^1.132.31",

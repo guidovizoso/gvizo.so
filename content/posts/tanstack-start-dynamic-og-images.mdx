@@ -1,120 +1,206 @@
 ---
 title: "Dynamic OG Images with TanStack Start"
-summary: "Creating dynamic OG images with TanStack Start a-la vercel/og."
+summary: "Building dynamic OG images in TanStack Start. Inspired by vercel/og, powered by Takumi."
 publishedAt: "2025-10-12"
 ---
 
 # Dynamic OG Images with TanStack Start
 
-When we started building our product, we knew one thing for sure: we didn't want to play the guessing game between backend and frontend.
+I love the **TanStack ecosystem**, and especially **TanStack Start** — it’s modern, fast, and feels like the natural evolution of React routing.  
+But there’s one thing we missed from the Next.js and Vercel world: the sheer convenience of **dynamic OG images**.
 
-I usually TypeScript all the things, but this time we decided to build a FastAPI backend. That left us out of luck when it came to using TRPC for typing our API.
+Those little preview cards you see when sharing links on social media aren’t just pretty — they’re *tiny brand ambassadors*. They extend your site’s personality outside the browser, and when done right, they look *amazing*.
 
-But here's the thing: type safety isn't something you should compromise on.
-
-You know the drill: wondering if that endpoint is `/v1/customers` or `/api/customers`? Trying to remember if that field is called `name` or `full_name`? Manually maintaining TypeScript types for backend responses?
-
-Instead of bolting on type safety later, we designed our stack around it from day one.
+So we decided to bring that experience to TanStack Start — **a-la `vercel/og`**, but with our own flavor.
 
 ---
 
-## Act I: FastAPI as the Single Source of Truth
+## Act I: The Stack
 
-We chose FastAPI for our backend because it naturally encourages clean, explicit definitions. Every endpoint describes itself through Python type hints and Pydantic models. That means our API documentation and data validation come for free, and so does the OpenAPI spec.
+Our toolkit for this adventure:
 
-By default, FastAPI generates a live OpenAPI schema at `/openapi.json`. That's not just a nice bonus: it's an always-up-to-date contract for your entire system.
+- 🧭 **TanStack Start** — for server routes and the overall framework  
+- ⚡ **Takumi** — a Rust-based alternative to Satori (the engine behind `vercel/og`), offering incredible performance and WebAssembly support  
 
-We exposed it when running dev at `http://localhost:8000/openapi.json` so our frontend could consume it directly during local development.
+Together, they let us generate beautiful, dynamic images right from the server — no Node canvas, no complex setups.
 
 ---
 
-## Act II: Auto-Generated Types with `openapi-ts`
+## Act II: The Plan
 
-From the start, we wanted **the backend to define the truth** and **the frontend to just import it**.
+The idea was simple:
 
-Enter [`openapi-ts`](https://openapi-ts.dev/cli). With a single command, it takes that live FastAPI spec and transforms it into strongly typed TypeScript definitions.
+> Use a TanStack Start server route to dynamically generate images, passing in any metadata (like title or author) through query parameters.
 
-Here's how we set it up step by step:
+Every time a page is shared, that route renders a fresh OG image — on the fly.
 
-**1. Install `openapi-ts`**
+---
+
+## Act III: Installing Takumi
+
+First, we added Takumi to our project:
 
 ```bash
-bun add openapi-typescript
+bun add @takumi-rs/core @takumi-rs/helpers @takumi-rs/image-response
 ```
 
-**2. Create a script to generate the types in your frontend's `package.json`**
-
-```json filename="package.json"
-"scripts": {
-  "generate-types": "openapi-typescript http://localhost:8000/openapi.json -o src/types/api-schema.ts"
-}
-```
-
-Now every time you run `bun generate-types`, fresh types get generated in `src/types/api-schema.ts` and are ready to use.
-
-This generates not just the endpoint routes but also the request and response types for each endpoint. This makes it super easy to abstract the responses into types you can use throughout your application.
-
-```typescript filename=src/types/api-schema.ts
-import type { components } from "./api-schema";
-
-export type User = components["schemas"]["UserSchema"];
-```
-
-Done.
+That’s all you need.  
+Takumi’s core, helpers, and the `image-response` package handle everything — from JSX rendering to generating the final image buffer.
 
 ---
 
-## Act III: Type-Safe Calls with openapi-fetch
+## Act IV: Setting Up the Route
 
-The next piece of the puzzle was actually using those types to make requests. We didn't want just another generic fetch wrapper: we wanted something that knew what endpoints existed, what data they expected, and what they returned. So we went back to the openapi-ts ecosystem and found [`openapi-fetch`](https://openapi-ts.dev/openapi-fetch/), which was made exactly for this.
+Inside our TanStack Start project, we created a new **server route** at  
+`src/routes/api/og.tsx`.
 
-A simple wrapper and we were ready to go:
+```tsx
+import { createFileRoute } from "@tanstack/react-router";
 
-```typescript
-import createClient from "openapi-fetch";
-import { getConfig } from "@/config";
-import type { paths } from "@/types/api-schema"; // generated by openapi-typescript
-
-const config = getConfig();
-
-export const apiClient = createClient<paths>({
-  baseUrl: config.apiUrl,
-  credentials: "include",
+export const Route = createFileRoute("/og")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        // We'll handle the image generation here
+      },
+    },
+  },
 });
 ```
 
-Instant autocomplete. Compile-time validation. No runtime surprises.
-
-If someone changes a parameter or removes a field in the backend, the next frontend build fails loudly, exactly how we like it.
+This gives us a dedicated endpoint — `/api/og` — that we can hit with query parameters like `?title=My+Post&author=Guido`.
 
 ---
 
-## Act IV: The Developer Loop That Feels Effortless
+## Act V: The OG Component
 
-Here's what development looks like now:
+Next, we defined a simple JSX component to represent the OG layout.  
+This component will be rendered by Takumi when generating the image:
 
-**Define a new route in FastAPI**: add your path, input, and output models.
-
-**Run the backend**: FastAPI automatically regenerates `/openapi.json`.
-
-**Regenerate the frontend types:**
-
-```bash
-bun run generate-types
+```tsx
+function OgImage({
+  title = "Your amazing website.",
+  author = "Your name",
+}: {
+  title: string;
+  author: string;
+}) {
+  return (
+    <div
+      style={{
+        backgroundColor: "#ffffff",
+        width: "100%",
+        height: "100%",
+        padding: "5% 10%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <p
+        style={{
+          color: "#000000",
+          fontSize: "60px",
+          fontWeight: "normal",
+          paddingTop: "3%",
+        }}
+      >
+        {title}
+      </p>
+      <div style={{ marginTop: "auto" }}>
+        <p
+          style={{
+            color: "#000000",
+            fontSize: "30px",
+            fontWeight: "bold",
+            marginLeft: "auto",
+          }}
+        >
+          {author}
+        </p>
+      </div>
+    </div>
+  );
+}
 ```
 
-**Use it with openapi-fetch**: fully typed requests, right in your code editor.
-
-That's it. No manual syncs. No shared constants file. No "wait, who changed this?" Slack messages. It's a tiny workflow that scales beautifully.
+It’s minimal, readable, and fully customizable — you can later replace inline styles with your design system or Tailwind CSS-in-JSX utilities.
 
 ---
 
-## Summary: The Stack That Talks to Itself
+## Act VI: Putting It All Together
 
-**FastAPI**: defines endpoints and auto-generates OpenAPI
+Now, let’s hook the component into the route and generate the actual image.
 
-**openapi-ts**: turns that schema into TypeScript types
+We’ll dynamically import Takumi’s `ImageResponse` inside our route to avoid bundling it into the client.
 
-**openapi-fetch**: makes fully typed API calls
+```tsx
+export const Route = createFileRoute("/og")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const { ImageResponse } = await import("@takumi-rs/image-response");
 
-Together, they create a developer experience that feels almost magical: everything stays in sync, automatically, all the time.
+        const url = new URL(request.url);
+        const title = url.searchParams.get("title");
+        const author = url.searchParams.get("author");
+
+        return new ImageResponse(<OgImage title={title} author={author} />, {
+          width: 1200,
+          height: 630,
+        });
+      },
+    },
+  },
+});
+```
+
+That’s it — you now have a fully dynamic OG image generator.  
+Hit `/og?title=Hello%20World&author=Guido` and watch it render.
+
+---
+
+## Act VII: Integrating with Your Head Tags
+
+To make it useful for SEO and social sharing, you can include your new OG route inside your TanStack Start root head.
+
+```tsx
+// src/routes/__root.tsx
+
+export const Route = createRootRouteWithContext<RouterAppContext>()({
+  head: () => ({
+    meta: [
+      // ... other meta tags
+      {
+        name: "og:image",
+        content: "YOUR_URL/og?title=YOUR_TITLE&author=YOUR_AUTHOR",
+      },
+    ],
+  }),
+  component: RootDocument,
+});
+```
+
+Now, every page you share on Twitter, LinkedIn, or Slack will generate a beautiful, dynamic image in real time.
+
+---
+
+## Act VIII: Beyond the Basics
+
+This pattern scales beautifully:
+
+- You can generate **unique images per blog post** by setting the `og:image` tag dynamically in each route.
+- You can pull data from your CMS or filesystem.
+- You can even render SVGs, logos, or gradients — all using JSX.
+
+And because it’s Rust-powered via Takumi, you get blazing-fast image generation with minimal overhead.
+
+---
+
+## Epilogue
+
+With just a few lines of code, we brought **vercel/og-style dynamic image generation** to **TanStack Start** — with full type safety and performance to match.
+
+It’s another example of how flexible the TanStack ecosystem is — you don’t need Next.js to get powerful, modern capabilities.
+
+Dynamic, fast, and built the TanStack way.  
+That’s the kind of magic we like.
