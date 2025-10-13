@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  serverExternalPackages: ["@takumi-rs/core"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "pbs.twimg.com" },
