@@ -33,6 +33,6 @@ export default defineConfig({
     preset: "vercel",
   },
   ssr: {
-    external: ["@takumi-rs/core"],
+    noExternal: ["@takumi-rs/core"],
   },
 });
