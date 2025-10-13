@@ -1,0 +1,3 @@
+{
+  "installCommand": "chmod +x vercel-build.sh && ./vercel-build.sh"
+}
