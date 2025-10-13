@@ -21,11 +21,11 @@ type FrontMatter = {
 export async function generateMetadata({
   params,
 }: {
-  params: PageParams;
+  params: Promise<PageParams>;
 }): Promise<Metadata | undefined> {
   const post = await (
     await getBlogPosts()
-  ).find((post) => post.slug === params.slug);
+  ).find((post) => post.slug === (await params).slug);
 
   if (!post) {
     return;
@@ -62,10 +62,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function Post({ params }: { params: PageParams }) {
+export default async function Post({ params }: { params: Promise<PageParams> }) {
   const post = (await (
     await getBlogPosts()
-  ).find((post) => post.slug === params.slug)) as {
+  ).find((post) => post.slug === (await params).slug)) as {
     slug: string;
     frontmatter: FrontMatter;
     rawContent: string;
