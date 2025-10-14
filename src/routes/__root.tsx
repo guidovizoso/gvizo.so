@@ -39,7 +39,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
       {
         name: "og:image",
-        content: "https://www.guidovizoso.com/og",
+        content: "https://www.gvizo.so/og",
       },
 
       {

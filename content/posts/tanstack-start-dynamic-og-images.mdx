@@ -47,6 +47,28 @@ bun add @takumi-rs/core @takumi-rs/helpers @takumi-rs/image-response
 That’s all you need.  
 Takumi’s core, helpers, and the `image-response` package handle everything — from JSX rendering to generating the final image buffer.
 
+> ⚠️ **Important**:
+> If you're planning on deploying this to Vercel, you need to add the following to your `vite.config.ts`:
+
+```ts
+nitro: {
+    preset: "vercel",
+    externals: {
+      traceInclude: [
+        "node_modules/@takumi-rs/core",
+        "node_modules/@takumi-rs/image-response",
+        "node_modules/@takumi-rs/helpers",
+        "node_modules/@takumi-rs/core-linux-x64-gnu",
+        "node_modules/@takumi-rs/core-linux-arm64-gnu",
+        "node_modules/@takumi-rs/core-darwin-arm64",
+        "node_modules/@takumi-rs/core-darwin-x64",
+      ],
+    },
+  },
+```
+
+This will tell Nitro to include the necessary files in the output and Vercel's function will find the appropriate binary for the platform.
+
 ---
 
 ## Act IV: Setting Up the Route

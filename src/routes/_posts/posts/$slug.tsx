@@ -14,6 +14,10 @@ export const Route = createFileRoute("/_posts/posts/$slug")({
       ? [
           { title: `${loaderData.post?.title} | G` },
           { description: loaderData.post?.summary },
+          {
+            name: "og:image",
+            content: `https://www.gvizo.so/og?title=${loaderData.post?.title}`,
+          },
         ]
       : undefined,
   }),
