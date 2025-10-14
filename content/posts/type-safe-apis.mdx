@@ -4,45 +4,49 @@ summary: "Generating types from FastAPI and using them in Typescript automatical
 publishedAt: "2025-10-12"
 ---
 
-# You don't need TRPC for Type-Safe APIs
+# You Don’t Need tRPC for Type-Safe APIs
 
-When we started building our product, we knew one thing for sure: we didn't want to play the guessing game between backend and frontend.
+If you’ve ever built a frontend and backend at the same time, you know the pain.  
+Did that endpoint change? Is it `/v1/customers` or `/api/customers` this time?  
+And wait,was that field `name`, `full_name`, or `display_name`?
 
-I usually TypeScript all the things, but this time we decided to build a FastAPI backend. That left us out of luck when it came to using TRPC for typing our API.
+We’ve all been there. Guessing, checking docs, syncing Slack messages, and hoping your TypeScript types match what your API actually returns. It’s the modern version of “it works on my machine.”
 
-But here's the thing: type safety isn't something you should compromise on.
+When we started building our product, I promised myself: **no more guessing games**.  
+We wanted the backend and frontend to speak the same language, literally.
 
-You know the drill: wondering if that endpoint is `/v1/customers` or `/api/customers`? Trying to remember if that field is called `name` or `full_name`? Manually maintaining TypeScript types for backend responses?
+But there was one catch: we weren’t using tRPC. Our backend was written in **FastAPI**, not TypeScript.
 
-Instead of bolting on type safety later, we designed our stack around it from day one.
-
----
-
-## Act I: FastAPI as the Single Source of Truth
-
-We chose FastAPI for our backend because it naturally encourages clean, explicit definitions. Every endpoint describes itself through Python type hints and Pydantic models. That means our API documentation and data validation come for free, and so does the OpenAPI spec.
-
-By default, FastAPI generates a live OpenAPI schema at `/openapi.json`. That's not just a nice bonus: it's an always-up-to-date contract for your entire system.
-
-We exposed it when running dev at `http://localhost:8000/openapi.json` so our frontend could consume it directly during local development.
+Still, we refused to give up on type safety. Here’s how we built a stack where Python and TypeScript stay perfectly in sync, no manual typings, no runtime surprises.
 
 ---
 
-## Act II: Auto-Generated Types with `openapi-ts`
+## FastAPI: The Single Source of Truth
 
-From the start, we wanted **the backend to define the truth** and **the frontend to just import it**.
+FastAPI was our backend of choice because it *forces* clarity. Every endpoint is defined with Python type hints and [Pydantic](https://docs.pydantic.dev/) models. That means your validation, docs, and OpenAPI schema are all generated for free.
 
-Enter [`openapi-ts`](https://openapi-ts.dev/cli). With a single command, it takes that live FastAPI spec and transforms it into strongly typed TypeScript definitions.
+Out of the box, FastAPI gives you a live spec at `/openapi.json`.  
+That’s not just a nice dev tool, it’s an always-up-to-date **contract** for your entire system.
 
-Here's how we set it up step by step:
+During local development, we expose it at `http://localhost:8000/openapi.json` so the frontend can pull from it directly. The backend defines reality; the frontend just follows.
 
-**1. Install `openapi-ts`**
+---
+
+## Auto-Generated Types with `openapi-ts`
+
+Our philosophy: **the backend defines the truth, the frontend imports it**.
+
+[`openapi-ts`](https://openapi-ts.dev/cli) makes that possible. With one command, it converts your FastAPI OpenAPI schema into TypeScript definitions.
+
+Here’s how easy it is to set up:
+
+**1. Install the package**
 
 ```bash
 bun add openapi-typescript
 ```
 
-**2. Create a script to generate the types in your frontend's `package.json`**
+**2. Add a script in your frontend’s `package.json`**
 
 ```json filename="package.json"
 "scripts": {
@@ -50,9 +54,15 @@ bun add openapi-typescript
 }
 ```
 
-Now every time you run `bun generate-types`, fresh types get generated in `src/types/api-schema.ts` and are ready to use.
+Now, running `bun generate-types` regenerates your API types automatically:
 
-This generates not just the endpoint routes but also the request and response types for each endpoint. This makes it super easy to abstract the responses into types you can use throughout your application.
+```bash
+bun run generate-types
+```
+
+You’ll get a file like `src/types/api-schema.ts`, containing every route, request, and response ready to import anywhere in your app.
+
+Example:
 
 ```typescript filename=src/types/api-schema.ts
 import type { components } from "./api-schema";
@@ -60,20 +70,25 @@ import type { components } from "./api-schema";
 export type User = components["schemas"]["UserSchema"];
 ```
 
-Done.
+No manual maintenance. No mismatched shapes. Just perfectly aligned types.
 
 ---
 
-## Act III: Type-Safe Calls with openapi-fetch
+## Type-Safe Fetching with `openapi-fetch`
 
-The next piece of the puzzle was actually using those types to make requests. We didn't want just another generic fetch wrapper: we wanted something that knew what endpoints existed, what data they expected, and what they returned. So we went back to the openapi-ts ecosystem and found [`openapi-fetch`](https://openapi-ts.dev/openapi-fetch/), which was made exactly for this.
+Generating types is only half the story, you also need a way to *use* them.
 
-A simple wrapper and we were ready to go:
+We didn’t want yet another fetch wrapper. We wanted something that actually **knew** what endpoints existed, what data they expected, and what they returned.
+
+[`openapi-fetch`](https://openapi-ts.dev/openapi-fetch/) does exactly that.  
+It’s part of the same ecosystem, designed to work seamlessly with `openapi-ts`.
+
+Here’s the setup:
 
 ```typescript
 import createClient from "openapi-fetch";
 import { getConfig } from "@/config";
-import type { paths } from "@/types/api-schema"; // generated by openapi-typescript
+import type { paths } from "@/types/api-schema"; // generated types
 
 const config = getConfig();
 
@@ -83,38 +98,49 @@ export const apiClient = createClient<paths>({
 });
 ```
 
-Instant autocomplete. Compile-time validation. No runtime surprises.
-
-If someone changes a parameter or removes a field in the backend, the next frontend build fails loudly, exactly how we like it.
-
----
-
-## Act IV: The Developer Loop That Feels Effortless
-
-Here's what development looks like now:
-
-**Define a new route in FastAPI**: add your path, input, and output models.
-
-**Run the backend**: FastAPI automatically regenerates `/openapi.json`.
-
-**Regenerate the frontend types:**
-
-```bash
-bun run generate-types
-```
-
-**Use it with openapi-fetch**: fully typed requests, right in your code editor.
-
-That's it. No manual syncs. No shared constants file. No "wait, who changed this?" Slack messages. It's a tiny workflow that scales beautifully.
+The result? Instant autocomplete. Compile-time validation.  
+Change a backend parameter or remove a field, and your frontend won’t even compile.  
+That’s the kind of failure we like: **the safe kind**.
 
 ---
 
-## Summary: The Stack That Talks to Itself
+## The Developer Experience Feels Effortless
 
-**FastAPI**: defines endpoints and auto-generates OpenAPI
+Here’s our new workflow in action:
 
-**openapi-ts**: turns that schema into TypeScript types
+1. **Define a route in FastAPI.** Add your path, input, and output models.  
+2. **Run the backend.** FastAPI automatically updates `/openapi.json`.  
+3. **Regenerate frontend types.**
 
-**openapi-fetch**: makes fully typed API calls
+   ```bash
+   bun run generate-types
+   ```
+4. **Use it with `openapi-fetch`.** You get fully typed requests right in your editor.
 
-Together, they create a developer experience that feels almost magical: everything stays in sync, automatically, all the time.
+No manual syncs. No shared constants file. No Slack pings asking,  
+> “Hey, did you rename that field again?”
+
+It’s clean, reliable, and scales beautifully as your API grows.
+
+---
+
+## The Stack That Talks to Itself
+
+Here’s the full picture:
+
+- **FastAPI** → defines endpoints and auto-generates OpenAPI  
+- **openapi-ts** → converts schema into TypeScript types  
+- **openapi-fetch** → makes fully typed API calls  
+
+Together, they form a self-documenting, type-safe feedback loop between backend and frontend.  
+It’s not magic, it just feels like it.
+
+---
+
+### Takeaway
+
+You don’t need tRPC to get a type-safe workflow.  
+If your backend already speaks OpenAPI (and FastAPI does), you’re just a few commands away from full-stack type safety.
+
+Because the best kind of integration?  
+The one that never drifts out of sync.

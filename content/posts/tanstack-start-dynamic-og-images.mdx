@@ -1,80 +1,83 @@
 ---
-title: "Dynamic OG Images with TanStack Start"
-summary: "Building dynamic OG images in TanStack Start. Inspired by vercel/og, powered by Takumi."
-publishedAt: "2025-10-12"
+title: "Bringing Dynamic OG Images to TanStack Start with Takumi"
+summary: "Building dynamic OG images in TanStack Start. Inspired by vercel/og."
+publishedAt: "2025-10-14"
+keywords: []
 ---
 
-# Dynamic OG Images with TanStack Start
+# Bringing Dynamic OG Images to TanStack Start with Takumi
 
-I love the **TanStack ecosystem**, and especially **TanStack Start** — it’s modern, fast, and feels like the natural evolution of React routing.  
-But there’s one thing we missed from the Next.js and Vercel world: the sheer convenience of **dynamic OG images**.
+There’s something magical about Open Graph images.  
+They’re tiny, silent ambassadors that travel with your links showing up on Twitter, LinkedIn, and Slack to make your content look polished and intentional.
 
-Those little preview cards you see when sharing links on social media aren’t just pretty — they’re *tiny brand ambassadors*. They extend your site’s personality outside the browser, and when done right, they look *amazing*.
+But when I started working with **TanStack Start**, I noticed something missing:  
+Where was the “dynamic OG image” experience we’d gotten so used to from Next.js and Vercel?
 
-So we decided to bring that experience to TanStack Start — **a-la `vercel/og`**, but with our own flavor.
-
----
-
-## Act I: The Stack
-
-Our toolkit for this adventure:
-
-- 🧭 **TanStack Start** — for server routes and the overall framework  
-- ⚡ **Takumi** — a Rust-based alternative to Satori (the engine behind `vercel/og`), offering incredible performance and WebAssembly support  
-
-Together, they let us generate beautiful, dynamic images right from the server — no Node canvas, no complex setups.
+So, we built it ourselves.  
+And spoiler: it’s easier than you think.
 
 ---
 
-## Act II: The Plan
+## The Problem
 
-The idea was simple:
+If you’ve ever used `vercel/og`, you know how simple it is to generate dynamic images at runtime. You pass a few query parameters, and out pops a beautiful preview with custom text, background, or even user avatars.
 
-> Use a TanStack Start server route to dynamically generate images, passing in any metadata (like title or author) through query parameters.
+That’s not built into **TanStack Start**. But the good news is that TanStack’s server routes are flexible enough to handle the same use case. We just need the right renderer.
 
-Every time a page is shared, that route renders a fresh OG image — on the fly.
+That’s where [Takumi](https://takumi.kane.tw/) comes in, a Rust-powered alternative to Satori (the engine behind `vercel/og`), with WebAssembly support and blazing performance.  
+Together, these two tools let us bring dynamic image generation into TanStack’s world, no Node canvas hacks required.
 
 ---
 
-## Act III: Installing Takumi
+## The Plan
 
-First, we added Takumi to our project:
+Here’s the simple idea:
+
+> Create a server route in TanStack Start that renders a JSX component into an image, using Takumi under the hood.
+
+We can then pass in query parameters (like title, author, or background color), and the route will return a new OG image on the fly.
+
+This is perfect for blog posts, changelogs, or any content-heavy site where every page deserves its own visual identity.
+
+---
+
+## Installing Takumi
+
+Start by installing Takumi’s core packages:
 
 ```bash
 bun add @takumi-rs/core @takumi-rs/helpers @takumi-rs/image-response
 ```
 
-That’s all you need.  
-Takumi’s core, helpers, and the `image-response` package handle everything — from JSX rendering to generating the final image buffer.
+That’s all you need to start generating images.
 
-> ⚠️ **Important**:
-> If you're planning on deploying this to Vercel, you need to add the following to your `vite.config.ts`:
+If you’re deploying to Vercel, there’s one small configuration tweak you’ll need. In your `vite.config.ts`, tell Nitro to include Takumi’s binaries:
 
 ```ts
 nitro: {
-    preset: "vercel",
-    externals: {
-      traceInclude: [
-        "node_modules/@takumi-rs/core",
-        "node_modules/@takumi-rs/image-response",
-        "node_modules/@takumi-rs/helpers",
-        "node_modules/@takumi-rs/core-linux-x64-gnu",
-        "node_modules/@takumi-rs/core-linux-arm64-gnu",
-        "node_modules/@takumi-rs/core-darwin-arm64",
-        "node_modules/@takumi-rs/core-darwin-x64",
-      ],
-    },
+  preset: "vercel",
+  externals: {
+    traceInclude: [
+      "node_modules/@takumi-rs/core",
+      "node_modules/@takumi-rs/image-response",
+      "node_modules/@takumi-rs/helpers",
+      "node_modules/@takumi-rs/core-linux-x64-gnu",
+      "node_modules/@takumi-rs/core-linux-arm64-gnu",
+      "node_modules/@takumi-rs/core-darwin-arm64",
+      "node_modules/@takumi-rs/core-darwin-x64",
+    ],
   },
+},
 ```
 
-This will tell Nitro to include the necessary files in the output and Vercel's function will find the appropriate binary for the platform.
+This ensures the right binary gets shipped with your build, regardless of platform.
 
 ---
 
-## Act IV: Setting Up the Route
+## Creating the Server Route
 
-Inside our TanStack Start project, we created a new **server route** at  
-`src/routes/api/og.tsx`.
+Let’s set up a new route at `src/routes/api/og.tsx`.  
+This will handle all incoming image requests.
 
 ```tsx
 import { createFileRoute } from "@tanstack/react-router";
@@ -90,14 +93,14 @@ export const Route = createFileRoute("/og")({
 });
 ```
 
-This gives us a dedicated endpoint — `/api/og` — that we can hit with query parameters like `?title=My+Post&author=Guido`.
+Now you have a live endpoint `/api/og` that can receive query parameters like `?title=Hello+World&author=Guido`.
 
 ---
 
-## Act V: The OG Component
+## Designing the OG Component
 
-Next, we defined a simple JSX component to represent the OG layout.  
-This component will be rendered by Takumi when generating the image:
+At the heart of this system is a simple JSX component.  
+It defines how your OG image looks:
 
 ```tsx
 function OgImage({
@@ -145,15 +148,15 @@ function OgImage({
 }
 ```
 
-It’s minimal, readable, and fully customizable — you can later replace inline styles with your design system or Tailwind CSS-in-JSX utilities.
+It’s minimal and readable, perfect for iteration.  
+You can swap in Tailwind-style utilities, gradients, or even SVG logos later.
 
 ---
 
-## Act VI: Putting It All Together
+## Generating the Image
 
-Now, let’s hook the component into the route and generate the actual image.
-
-We’ll dynamically import Takumi’s `ImageResponse` inside our route to avoid bundling it into the client.
+Now, let’s bring Takumi into the mix.  
+Inside our `GET` handler, we’ll dynamically import Takumi’s `ImageResponse` (so it doesn’t bloat the client bundle) and render our component.
 
 ```tsx
 export const Route = createFileRoute("/og")({
@@ -176,22 +179,19 @@ export const Route = createFileRoute("/og")({
 });
 ```
 
-That’s it — you now have a fully dynamic OG image generator.  
-Hit `/og?title=Hello%20World&author=Guido` and watch it render.
+Now, when you visit `/og?title=Hello%20World&author=Guido`, you’ll get a fully rendered OG image generated at runtime.
 
 ---
 
-## Act VII: Integrating with Your Head Tags
+## Adding It to Your Head Tags
 
-To make it useful for SEO and social sharing, you can include your new OG route inside your TanStack Start root head.
+To make your OG images visible to crawlers, include your route in the meta tags of each page.
 
 ```tsx
 // src/routes/__root.tsx
-
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
-      // ... other meta tags
       {
         name: "og:image",
         content: "YOUR_URL/og?title=YOUR_TITLE&author=YOUR_AUTHOR",
@@ -202,27 +202,27 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 ```
 
-Now, every page you share on Twitter, LinkedIn, or Slack will generate a beautiful, dynamic image in real time.
+Now, when someone shares your link, Twitter or Slack will automatically pull the generated image.
 
 ---
 
-## Act VIII: Beyond the Basics
+## Scaling It Up
 
-This pattern scales beautifully:
+Once you’ve got the basics down, the possibilities open up:
 
-- You can generate **unique images per blog post** by setting the `og:image` tag dynamically in each route.
-- You can pull data from your CMS or filesystem.
-- You can even render SVGs, logos, or gradients — all using JSX.
+- Generate unique images per blog post using metadata from your CMS.
+- Add logos, gradients, or brand patterns for visual consistency.
+- Create on-demand visuals for changelogs, documentation, or marketing pages.
 
-And because it’s Rust-powered via Takumi, you get blazing-fast image generation with minimal overhead.
+Because Takumi is written in Rust, it handles all this with impressive speed and minimal memory use.  
+It’s modern, efficient, and built for production.
 
 ---
 
-## Epilogue
+## The Takeaway
 
-With just a few lines of code, we brought **vercel/og-style dynamic image generation** to **TanStack Start** — with full type safety and performance to match.
+Dynamic OG images aren’t just a vanity feature: they’re a small but powerful way to extend your brand and make every link you share feel intentional.
 
-It’s another example of how flexible the TanStack ecosystem is — you don’t need Next.js to get powerful, modern capabilities.
+With TanStack Start’s flexibility and Takumi’s performance, you can bring that experience to your own stack without friction or vendor lock-in.
 
-Dynamic, fast, and built the TanStack way.  
-That’s the kind of magic we like.
+Dynamic, fast, and fully type-safe.  

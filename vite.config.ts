@@ -6,10 +6,12 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import wasm from "vite-plugin-wasm";
 import tsconfigPaths from "vite-tsconfig-paths";
+import arraybuffer from "vite-plugin-arraybuffer";
 
 export default defineConfig({
   plugins: [
     wasm(),
+    arraybuffer(),
     contentCollections(),
     tsconfigPaths(),
     tailwindcss(),

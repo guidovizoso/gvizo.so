@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ImageResponse from "@takumi-rs/image-response";
+import loraBinary from "@/assets/lora.woff2?arraybuffer";
+import interBinary from "@/assets/inter-500.woff2?arraybuffer";
 
 function Logo() {
   return (
@@ -29,7 +31,7 @@ function OgImage({ title }: { title: string | React.ReactNode }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "start",
-        justifyContent: "start",
+        justifyContent: "space-between",
       }}
     >
       <Logo />
@@ -37,21 +39,23 @@ function OgImage({ title }: { title: string | React.ReactNode }) {
         style={{
           fontSize: "60px",
           fontWeight: "normal",
-          marginTop: "7%",
+          fontFamily: "Lora",
+          lineHeight: "1.5",
         }}
       >
         {title}
       </h1>
       <p
         style={{
-          marginTop: "auto",
-          fontSize: "36px",
+          fontSize: "32px",
           fontWeight: "normal",
           textAlign: "right",
           width: "100%",
+          fontFamily: "Inter",
+          letterSpacing: "-20%",
         }}
       >
-        Guido Vizoso
+        gvizo.so
       </p>
     </div>
   );
@@ -60,7 +64,7 @@ function OgImage({ title }: { title: string | React.ReactNode }) {
 export const Route = createFileRoute("/og")({
   server: {
     handlers: {
-      GET: async ({ request }: { request: Request }) => {
+      GET: ({ request }: { request: Request }) => {
         const url = new URL(request.url);
         const titleParam = url.searchParams.get("title");
         const title = titleParam ?? (
@@ -74,6 +78,20 @@ export const Route = createFileRoute("/og")({
         const image = new ImageResponse(<OgImage title={title} />, {
           width: 1200,
           height: 630,
+          fonts: [
+            {
+              name: "Lora",
+              data: Buffer.from(loraBinary),
+              style: "normal",
+              weight: 400,
+            },
+            {
+              name: "Inter",
+              data: Buffer.from(interBinary),
+              style: "normal",
+              weight: 500,
+            },
+          ],
         });
 
         return image;
