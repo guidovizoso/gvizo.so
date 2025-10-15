@@ -2,14 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { allPosts } from "content-collections";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
+import { pageSEO } from "@/lib/seo";
 
 export const Route = createFileRoute("/_posts/posts/")({
-	head: () => ({
-		meta: [
-			{ title: "Articles | G" },
-			{ description: "Articles by Guido Vizoso" },
-		],
-	}),
+	head: () => {
+		const { meta, links, scripts } = pageSEO({
+			title: "Articles",
+			description: "Articles by Guido Vizoso",
+		});
+		return {
+			meta: [...meta],
+			links: [...links],
+			scripts: [...scripts],
+		};
+	},
 	component: RouteComponent,
 });
 
