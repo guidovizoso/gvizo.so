@@ -2,8 +2,8 @@ const experience = [
   {
     date: "2025 — Today",
     title: "Founding Product Engineer",
-    at: "Particle Intel",
-    atUrl: "https://particleintel.com",
+    at: "Sandbar",
+    atUrl: "https://sandbar.ai",
     desc: "Building the next generation of anti-money laundering screening solutions. Stack: Python, FastAPI, Typescript, React, PostgreSQL, Docker, AWS.",
   },
   {
