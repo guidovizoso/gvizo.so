@@ -3,21 +3,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, Text, View, Document, StyleSheet, Link, Font, } from "@react-pdf/renderer";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { experience } from "@/lib/data";
-import loraMedium from '@/assets/lora-medium.ttf?url'
-import interMedium from '@/assets/inter-medium.ttf?url'
-import interRegular from '@/assets/inter-regular.ttf?url'
 
 
 Font.register({
     family: 'Lora', fonts: [
-        { src: `${process.cwd()}${loraMedium}`, fontStyle: "normal", fontWeight: 500 },
+        { src: "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787wsuxJPkq18ndeYxZ2JTg.woff2", fontStyle: "normal", fontWeight: 500 },
     ]
 });
 
 Font.register({
     family: 'Inter', fonts: [
-        { src: `${process.cwd()}${interMedium}`, fontStyle: "normal", fontWeight: 500 },
-        { src: `${process.cwd()}${interRegular}`, fontStyle: "normal", fontWeight: 400 },
+        { src: "https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcviYwYZ8UA3.woff2", fontStyle: "normal", fontWeight: 500 },
+        { src: "https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcviYwYZ8UA3.woff2", fontStyle: "normal", fontWeight: 400 },
     ]
 });
 
@@ -65,8 +62,8 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 18,
-        fontWeight: "bold",
         fontFamily: "Lora",
+        fontWeight: "500",
     },
     intro: {
         marginBottom: 10,
@@ -122,7 +119,7 @@ export const Route = createFileRoute("/_app/resume")({
                     headers: {
                         "Content-Type": "application/pdf",
                         "Content-Disposition": `inline; filename="guido-vizoso-resume.pdf"`,
-                        "Cache-Control": "no-store",
+                        // "Cache-Control": "no-store",
                     },
                 });
             },
