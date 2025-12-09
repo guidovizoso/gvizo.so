@@ -55,9 +55,10 @@ export function Header() {
               <li>
                 <a
                   className="font-normal text-muted-foreground hover:text-foreground"
-                  href="/guido-vizoso-resume.pdf"
+                  download="/guido-vizoso-resume.pdf"
+                  href="https://www.gvizo.so/guido-vizoso-resume.pdf"
                   rel="noopener noreferrer"
-                  target="_blank"
+                  target="_self"
                 >
                   Resume
                 </a>
