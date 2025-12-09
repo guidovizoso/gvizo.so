@@ -55,7 +55,7 @@ export function Header() {
               <li>
                 <a
                   className="font-normal text-muted-foreground hover:text-foreground"
-                  href="/resume"
+                  href="/guido-vizoso-resume.pdf"
                   rel="noopener noreferrer"
                   target="_blank"
                 >

@@ -112,7 +112,7 @@ export const Route = createFileRoute("/_app/resume")({
                     headers: {
                         "Content-Type": "application/pdf",
                         "Content-Disposition": `inline; filename="guido-vizoso-resume.pdf"`,
-                        // "Cache-Control": "no-store",
+                        "Cache-Control": "no-store",
                     },
                 });
             },
