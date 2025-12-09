@@ -52,6 +52,16 @@ export function Header() {
                   Github
                 </a>
               </li>
+              <li>
+                <a
+                  className="font-normal text-muted-foreground hover:text-foreground"
+                  href="/resume"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Resume
+                </a>
+              </li>
             </ul>
           </div>
         </div>

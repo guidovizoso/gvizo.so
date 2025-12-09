@@ -13,6 +13,7 @@ import { Route as OgRouteImport } from './routes/og'
 import { Route as PostsRouteImport } from './routes/_posts'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppResumeRouteImport } from './routes/_app/resume'
 import { Route as PostsPostsIndexRouteImport } from './routes/_posts/posts/index'
 import { Route as PostsPostsSlugRouteImport } from './routes/_posts/posts/$slug'
 
@@ -34,6 +35,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppResumeRoute = AppResumeRouteImport.update({
+  id: '/resume',
+  path: '/resume',
+  getParentRoute: () => AppRoute,
+} as any)
 const PostsPostsIndexRoute = PostsPostsIndexRouteImport.update({
   id: '/posts/',
   path: '/posts/',
@@ -47,12 +53,14 @@ const PostsPostsSlugRoute = PostsPostsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/og': typeof OgRoute
+  '/resume': typeof AppResumeRoute
   '/': typeof AppIndexRoute
   '/posts/$slug': typeof PostsPostsSlugRoute
   '/posts': typeof PostsPostsIndexRoute
 }
 export interface FileRoutesByTo {
   '/og': typeof OgRoute
+  '/resume': typeof AppResumeRoute
   '/': typeof AppIndexRoute
   '/posts/$slug': typeof PostsPostsSlugRoute
   '/posts': typeof PostsPostsIndexRoute
@@ -62,20 +70,22 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_posts': typeof PostsRouteWithChildren
   '/og': typeof OgRoute
+  '/_app/resume': typeof AppResumeRoute
   '/_app/': typeof AppIndexRoute
   '/_posts/posts/$slug': typeof PostsPostsSlugRoute
   '/_posts/posts/': typeof PostsPostsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/og' | '/' | '/posts/$slug' | '/posts'
+  fullPaths: '/og' | '/resume' | '/' | '/posts/$slug' | '/posts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/og' | '/' | '/posts/$slug' | '/posts'
+  to: '/og' | '/resume' | '/' | '/posts/$slug' | '/posts'
   id:
     | '__root__'
     | '/_app'
     | '/_posts'
     | '/og'
+    | '/_app/resume'
     | '/_app/'
     | '/_posts/posts/$slug'
     | '/_posts/posts/'
@@ -117,6 +127,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/resume': {
+      id: '/_app/resume'
+      path: '/resume'
+      fullPath: '/resume'
+      preLoaderRoute: typeof AppResumeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_posts/posts/': {
       id: '/_posts/posts/'
       path: '/posts'
@@ -135,10 +152,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppResumeRoute: typeof AppResumeRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppResumeRoute: AppResumeRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
