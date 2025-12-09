@@ -6,15 +6,9 @@ import { experience } from "@/lib/data";
 
 
 Font.register({
-    family: 'Lora', fonts: [
-        { src: "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787wsuxJPkq18ndeYxZ2JTg.woff2", fontStyle: "normal", fontWeight: 500 },
-    ]
-});
-
-Font.register({
     family: 'Inter', fonts: [
-        { src: "https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcviYwYZ8UA3.woff2", fontStyle: "normal", fontWeight: 500 },
-        { src: "https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcviYwYZ8UA3.woff2", fontStyle: "normal", fontWeight: 400 },
+        { src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf", fontStyle: "normal", fontWeight: 500 },
+        { src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf", fontStyle: "normal", fontWeight: 400 },
     ]
 });
 
@@ -62,7 +56,6 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 18,
-        fontFamily: "Lora",
         fontWeight: "500",
     },
     intro: {
