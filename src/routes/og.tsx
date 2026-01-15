@@ -67,7 +67,7 @@ export const Route = createFileRoute("/og")({
       GET: ({ request }: { request: Request }) => {
         const url = new URL(request.url);
         const titleParam = url.searchParams.get("title");
-        const title = !!titleParam ? (
+        const title = titleParam !== null ? (
           titleParam
         ) : (
           <>
